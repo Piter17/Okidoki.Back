@@ -51,7 +51,7 @@ builder.Services.AddCors(options =>
         policy
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .WithOrigins("https://okidoki.fun", "https://test.okidoki.fun", "	https://stage.okidoki-test.pages.dev", "http://localhost:6226", "https://localhost:6226", "https://okivps.polandcentral.cloudapp.azure.com")
+            .WithOrigins("https://okidoki.fun", "https://test.okidoki.fun", "http://localhost:6226", "https://localhost:6226")
             .AllowCredentials();
     });
 });
