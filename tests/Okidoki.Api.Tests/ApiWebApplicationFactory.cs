@@ -31,7 +31,7 @@ public sealed class ApiWebApplicationFactory : WebApplicationFactory<Program>, I
             });
         });
         builder.UseSetting("ConnectionStrings:AppDb", container.GetConnectionString());
-        builder.UseSetting("ConnectionStrings:AppDb", "UseDevelopmentStorage=true");
+        builder.UseSetting("ConnectionStrings:BlobStorage", "UseDevelopmentStorage=true");
     }
 
     public async ValueTask InitializeAsync()
