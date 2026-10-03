@@ -25,7 +25,6 @@
     <ProjectReference Include="../../src/Okidoki.App/Okidoki.App.csproj" />
     <ProjectReference Include="../../src/Okidoki.Api/Okidoki.Api.csproj" />
     <ProjectReference Include="../../src/Okidoki.Infrastructure/Okidoki.Infrastructure.csproj" />
-    <ProjectReference Include="..\..\openapi\Okidoki.Client\src\Okidoki.Client\Okidoki.Client.csproj" />
   </ItemGroup>
 
   <ItemGroup>

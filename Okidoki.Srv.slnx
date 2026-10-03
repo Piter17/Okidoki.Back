@@ -12,6 +12,5 @@
     <File Path="openapi/Okidoki.Api.json"/>
     <File Path="openapi/genapi.sh"/>
     <File Path="openapi/config.json"/>
-    <Project Path="openapi/Okidoki.Client/src/Okidoki.Client/Okidoki.Client.csproj"/>
   </Folder>
 </Solution>
