@@ -1,0 +1,39 @@
+{
+    "window.title": "back ${dirty}${activeEditorShort}",
+    "remote.autoForwardPorts": true,
+    "remote.portsAttributes": {
+        "5088": {
+            "label": "Okidoki API (Debug)",
+            "protocol": "http"
+        }
+    },
+    "workbench.colorCustomizations": {
+        "statusBar.background": "#356859",
+        "statusBar.foreground": "#FFFFFF",
+
+        "titleBar.activeBackground": "#1F6F5B",
+        "titleBar.inactiveBackground": "#174D40",
+
+        "activityBar.background": "#29483F",
+        "activityBar.foreground": "#E8F1ED"
+    },
+    "csharp-dev-tools.entityFramework.migrationPreferences": {
+        "Okidoki.Architecture.slnx": {
+            "startupProject": "src/Okidoki.Api/Okidoki.Api.csproj",
+            "migrationsProject": "src/Okidoki.Infrastructure/Okidoki.Infrastructure.csproj",
+            "dbContextClass": "ArchitectureDbContext",
+            "migrationsFolder": "Migrations",
+            "targetMigration": "m4"
+        },
+        "Okidoki.Srv.slnx": {
+            "startupProject": "src/Okidoki.Api/Okidoki.Api.csproj",
+            "migrationsProject": "src/Okidoki.Infrastructure/Okidoki.Infrastructure.csproj",
+            "dbContextClass": "AppDbContext",
+            "migrationsFolder": "Migrations",
+            "targetMigration": ""
+        }
+    },
+    "csharp-dev-tools.solutionViewer.selectedWorkspaceSolutions": [
+        "Okidoki.Srv.slnx"
+    ]
+}

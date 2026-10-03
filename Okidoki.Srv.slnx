@@ -1,0 +1,17 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Okidoki.Api/Okidoki.Api.csproj"/>
+    <Project Path="src/Okidoki.App/Okidoki.App.csproj"/>
+    <Project Path="src/Okidoki.Domain/Okidoki.Domain.csproj"/>
+    <Project Path="src/Okidoki.Infrastructure/Okidoki.Infrastructure.csproj"/>
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Okidoki.Api.Tests/Okidoki.Api.Tests.csproj"/>
+  </Folder>
+  <Folder Name="/openapi/">
+    <File Path="openapi/Okidoki.Api.json"/>
+    <File Path="openapi/genapi.sh"/>
+    <File Path="openapi/config.json"/>
+    <Project Path="openapi/Okidoki.Client/src/Okidoki.Client/Okidoki.Client.csproj"/>
+  </Folder>
+</Solution>
