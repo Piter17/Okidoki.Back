@@ -10,8 +10,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
-using Okidoki.App.Contracts;using Okidoki.App.Interfaces.Repositories;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Okidoki.Api.Configuration;
+using Okidoki.App.Contracts;
+using Okidoki.App.Interfaces.Repositories;
 using Okidoki.App.Interfaces.Services;
+using Okidoki.App.Mapping;
 using Okidoki.App.Services;
 using Okidoki.Domain.Entities;
 using Okidoki.Infrastructure.Exceptions;
@@ -26,9 +31,12 @@ public sealed class AuthController(
         IUserStore<Identity> _userStore,
         SignInManager<Identity> _signInManager,
         IEmailSender<Identity> _emailSender,
+        IGuildService _guildService,
         IUserService _userService,
         ICacheLoader _cacheLoader,
-        LinkGenerator _linkGenerator
+        LinkGenerator _linkGenerator,
+        IOptions<AnonymousRegisterOptions> _registerOptions,
+        IOptions<IdentityOptions> _identityOptions
     ) : ControllerBase
 {
     private static readonly EmailAddressAttribute _emailAddressAttribute = new();
@@ -37,6 +45,17 @@ public sealed class AuthController(
     private const string _confirmEmailEndpointName = $"MapIdentityApi-{_confirmEmailRoute}";
 
     private IUserEmailStore<Identity> _emailStore => (IUserEmailStore<Identity>)_userStore;
+
+    // [ProducesResponseType(typeof(RegisterOptionsDto), 200)]
+    [AllowAnonymous]
+    [HttpGet("registerOptions")]
+    public async Task<ActionResult<RegisterOptionsDto>> GetRegisterOptions() 
+    {
+        return new RegisterOptionsDto{
+            AnonymousRegister = _registerOptions.Value.AnonymousRegister,
+            Password = _identityOptions.Value.Password,
+        };
+    }
 
     // other methods are mapped in .MapIdentityApi<TUser>()
     [AllowAnonymous]
@@ -54,6 +73,12 @@ public sealed class AuthController(
         if (string.IsNullOrEmpty(email) || !_emailAddressAttribute.IsValid(email))
         {
             return CreateValidationProblem(IdentityResult.Failed(_userManager.ErrorDescriber.InvalidEmail(email)));
+        }
+
+        GuildInvitation? invitation = null;
+        if (request.GuildInvitationCode.IsNullOrEmpty() == false)
+        {
+            invitation = await _guildService.GetInvitationAsync(request.GuildInvitationCode!);
         }
 
         var userId = _idGenerator.CreateId();
@@ -78,6 +103,11 @@ public sealed class AuthController(
             if (!result.Succeeded)
             {
                 return CreateValidationProblem(result);
+            }
+
+            if (invitation is not null)
+            {
+                await _guildService.AcceptInvitationAsync(userId, invitation.Code);
             }
 
             await SendConfirmationEmailAsync(user, HttpContext, email);
@@ -107,6 +137,23 @@ public sealed class AuthController(
     [ProducesResponseType(typeof(AccessTokenResponse), 200)]
     public async Task<Results<EmptyHttpResult, ValidationProblem>> Register(AnonymusRegistrationRequest request)
     {
+        var anonymusOptions = _registerOptions.Value.AnonymousRegister;
+        if (anonymusOptions == AnonymousRegister.Deny)
+        {
+            return CreateAnonymusValidationProblem();
+        }
+        GuildInvitation? invitation = null;
+        if (request.GuildInvitationCode.IsNullOrEmpty() == false)
+        {
+            invitation = await _guildService.GetInvitationAsync(request.GuildInvitationCode!);
+        }
+        if (anonymusOptions == AnonymousRegister.AllowOnInvite
+            && invitation is null)
+        {
+            return CreateAnonymusValidationProblem();
+        }
+
+
         var profileName = request.ProfileName.Trim();
         var userId = _idGenerator.CreateId();
         var username = await _userService.GetFreeUserNameAsync(profileName);
@@ -129,6 +176,12 @@ public sealed class AuthController(
             {
                 return CreateValidationProblem(result);
             }
+
+            if (invitation is not null)
+            {
+                await _guildService.AcceptInvitationAsync(userId, invitation.Code);
+            }
+
 
             _signInManager.AuthenticationScheme = IdentityConstants.BearerScheme;
             await _signInManager.SignInAsync(user, isPersistent: false);
@@ -220,6 +273,14 @@ public sealed class AuthController(
             ?? throw new NotSupportedException($"Could not find endpoint named '{_confirmEmailEndpointName}'.");
 
         await _emailSender.SendConfirmationLinkAsync(user, email, HtmlEncoder.Default.Encode(confirmEmailUrl));
+    }
+
+    private static ValidationProblem CreateAnonymusValidationProblem()
+    {
+        return TypedResults.ValidationProblem(new Dictionary<string, string[]>
+        {
+            ["AnonymusRegisterOff"] = ["AnonymusRegister is currently not available"]
+        });
     }
 
     private static ValidationProblem CreateValidationProblem(IdentityResult result)

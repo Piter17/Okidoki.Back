@@ -16,6 +16,7 @@ public interface IGuildRepository
     Task<List<GuildProfile>> GetForUserAsync(long userId, CancellationToken cancellationToken = default);
     Task AddAsync(Guild guild, CancellationToken cancellationToken = default);
     Task<GuildInvitation?> GetInvitationAsync(string code, CancellationToken cancellationToken = default);
+    Task<GuildInvitation?> GetInvitationFullAsync(string code, CancellationToken cancellationToken = default);
     Task IncrementInvitationUsesAsync(long invitationId, CancellationToken cancellationToken = default);
     Task AddInvitationAsync(GuildInvitation invitation, CancellationToken cancellationToken = default);
     Task AddChannelAsync(GuildChannel channel, GuildEventLog eventLog, CancellationToken cancellationToken = default);

@@ -204,7 +204,7 @@ public class GuildService(
 
     public async Task<Guild?> AcceptInvitationAsync(long userId, string invitationCode, CancellationToken cancellationToken = default)
     {
-        var invitation = await guildRepository.GetInvitationAsync(invitationCode, cancellationToken);
+        var invitation = await guildRepository.GetInvitationFullAsync(invitationCode, cancellationToken);
         if (invitation?.Guild is null)
         {
             return null;

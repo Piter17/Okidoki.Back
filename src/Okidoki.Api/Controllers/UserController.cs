@@ -19,7 +19,6 @@ public class UserController(UserManager<Identity> _userManager, IUserService use
         }
         return TypedResults.Ok(new IdentityDto()
         {
-            UserName = user.UserName! ?? throw new NotSupportedException("Users must have an username."),
             Email = await _userManager.GetEmailAsync(user) ?? null,
             UserId = long.Parse(await _userManager.GetUserIdAsync(user) ?? throw new NotSupportedException("Users must have an id.")),
             IsEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user),

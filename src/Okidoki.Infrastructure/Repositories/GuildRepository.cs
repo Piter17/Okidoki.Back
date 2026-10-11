@@ -112,8 +112,15 @@ public class GuildRepository(AppDbContext context) : IGuildRepository
     public Task<GuildInvitation?> GetInvitationAsync(string code, CancellationToken cancellationToken = default)
         => context.GuildInvitations
             .Include(x => x.Guild.GuildProfile)
-            .Include(x => x.Guild.Roles)
+            .Include(x => x.CreatedBy)
+            .FirstOrDefaultAsync(x => x.Code == code && (x.ValidUntil == null || x.ValidUntil > DateTime.UtcNow), cancellationToken);
+
+        public Task<GuildInvitation?> GetInvitationFullAsync(string code, CancellationToken cancellationToken = default)
+        => context.GuildInvitations
+            .Include(x => x.Guild.GuildProfile)
             .Include(x => x.Guild.GuildUsers)
+            .Include(x => x.Guild.Roles)
+            .Include(x => x.CreatedBy)
             .FirstOrDefaultAsync(x => x.Code == code && (x.ValidUntil == null || x.ValidUntil > DateTime.UtcNow), cancellationToken);
 
     public Task IncrementInvitationUsesAsync(long invitationId, CancellationToken cancellationToken = default)

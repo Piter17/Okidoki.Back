@@ -98,8 +98,8 @@ public class UserRepository(AppDbContext context, ClaimsPrincipal claims, Random
     public Task<bool> IsUserNameUsedAsync(string userName)
         => context.Accounts.AnyAsync(x => x.Username == userName);
 
-    public async Task<User?> GetUserAsync(long id, CancellationToken cancellationToken = default)
-        => await context.Accounts
+    public Task<User?> GetUserAsync(long id, CancellationToken cancellationToken = default)
+        => context.Accounts
             .FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
 

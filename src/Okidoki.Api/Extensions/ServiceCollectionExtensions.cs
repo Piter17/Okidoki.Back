@@ -23,25 +23,6 @@ namespace Okidoki.Api.Extensions;
 
 public static class ServiceCollectionExtensions
 {
-    private static void IdentityOptionsBuilder(IdentityOptions options)
-    {
-        options.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+# ";
-        options.User.RequireUniqueEmail = false;
-
-        options.Password.RequireDigit = false;
-        options.Password.RequireNonAlphanumeric = false;
-        options.Password.RequireUppercase = false;
-        options.Password.RequireLowercase = false;
-        options.Password.RequiredLength = 6;
-
-        options.Lockout.MaxFailedAccessAttempts = 5;
-        options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(5);
-
-        options.SignIn.RequireConfirmedEmail = false;
-        options.SignIn.RequireConfirmedAccount = false;
-        options.SignIn.RequireConfirmedPhoneNumber = false;
-    }
-
     public static IServiceCollection AddApplicationServices(this IServiceCollection services, IConfiguration configuration)
     {
         services.ConfigureOptions<JsonOptionsSetup>();
@@ -60,7 +41,10 @@ public static class ServiceCollectionExtensions
         services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(sqlConnectionString));
 
-        services.AddIdentityCore<Identity>(IdentityOptionsBuilder)
+        services.Configure<IdentityOptions>(configuration.GetSection("Identity"));
+        services.Configure<AnonymousRegisterOptions>(configuration.GetSection("AnonymousRegister"));
+
+        services.AddIdentityCore<Identity>()
             .AddRoles<ApplicationRole>()
             .AddEntityFrameworkStores<AppDbContext>()
             .AddApiEndpoints();

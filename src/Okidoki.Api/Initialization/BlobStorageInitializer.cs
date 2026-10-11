@@ -1,5 +1,6 @@
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Okidoki.Api.Extensions;
 
 namespace Okidoki.Api.Initialization;
 
@@ -12,23 +13,29 @@ public class BlobStorageInitializer(
     {
         try
         {
-            logger.LogInformation("Initializing Blob Storage CORS settings...");
-
             var properties = await client.GetPropertiesAsync(cancellationToken);
 
-            properties.Value.Cors.Clear();
-            properties.Value.Cors.Add(new BlobCorsRule
+            var corsRule = new BlobCorsRule
             {
-                AllowedOrigins = "https://okidoki.fun, http://localhost:6226, https://localhost:6226, https://test.okidoki.fun",
-                AllowedMethods = "GET, HEAD, OPTIONS",
+                AllowedOrigins = "https://okidoki.fun,http://localhost:6226,https://localhost:6226,https://test.okidoki.fun",
+                AllowedMethods = "GET,HEAD,OPTIONS",
                 AllowedHeaders = "*",
                 ExposedHeaders = "*",
                 MaxAgeInSeconds = 3600
-            });
+            };
 
-            await client.SetPropertiesAsync(properties, cancellationToken: cancellationToken);
+            var isSame = properties.Value.Cors.Count == 1 &&
+                properties.Value.Cors[0].HasSameValuesAs(corsRule);
 
-            logger.LogInformation("Blob Storage CORS settings applied successfully.");
+            if (isSame == false)
+            {
+                logger.LogInformation("Initializing Blob Storage CORS settings...");
+                properties.Value.Cors.Clear();
+                properties.Value.Cors.Add(corsRule);
+                await client.SetPropertiesAsync(properties, cancellationToken: cancellationToken);
+
+                logger.LogInformation("Blob Storage CORS settings applied successfully.");
+            }
         }
         catch (Exception ex)
         {

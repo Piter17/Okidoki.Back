@@ -13,14 +13,14 @@ public class ChatRepository(AppDbContext context) : IChatRepository
             .Where(x => x.GuildChannelId == guildChannelId)
             .AsNoTracking();
 
-    public async Task<long?> GetGuildIdForChannelAsync(long guildChannelId, CancellationToken cancellationToken = default)
-        => await context.GuildChannels
+    public Task<long?> GetGuildIdForChannelAsync(long guildChannelId, CancellationToken cancellationToken = default)
+        => context.GuildChannels
             .Where(channel => channel.Id == guildChannelId)
             .Select(channel => (long?)channel.GuildId)
             .SingleOrDefaultAsync(cancellationToken);
 
-    public async Task<ChatMessage?> GetMessageAsync(long messageId, CancellationToken cancellationToken = default)
-        => await context.ChatMessages.FirstOrDefaultAsync(x => x.Id == messageId, cancellationToken);
+    public Task<ChatMessage?> GetMessageAsync(long messageId, CancellationToken cancellationToken = default)
+        => context.ChatMessages.FirstOrDefaultAsync(x => x.Id == messageId, cancellationToken);
 
     public async Task<IReadOnlyList<ChatMessage>> GetMessagesAsync(
         long guildChannelId,

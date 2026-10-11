@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Okidoki.App.Contracts;
@@ -73,6 +74,7 @@ public class GuildsController(IGuildService service, IUserPresence userPresence)
         return TypedResults.Ok(GuildMapper.ToDto(entity));
     }
 
+    [AllowAnonymous]
     [HttpGet("invites/{invitationCode}")]
     public async Task<Results<Ok<GuildInvitationDto>, NotFound>> GetInvitation(string invitationCode, CancellationToken cancellationToken)
     {

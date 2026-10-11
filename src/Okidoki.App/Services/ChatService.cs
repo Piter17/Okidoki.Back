@@ -35,14 +35,12 @@ public class ChatService(
         return message;
     }
 
-    public async Task<IReadOnlyList<ChatMessage>> GetMessagesAsync(
+    public Task<IReadOnlyList<ChatMessage>> GetMessagesAsync(
         long guildChannelId,
         QueryDirection direction = QueryDirection.Prev,
         long? cursor = null,
         CancellationToken cancellationToken = default)
-    {
-        return await chatRepository.GetMessagesAsync(guildChannelId, direction, cursor, cancellationToken);
-    }
+            => chatRepository.GetMessagesAsync(guildChannelId, direction, cursor, cancellationToken);
 
     public async Task DeleteMessageAsync(long userId, long messageId, CancellationToken cancellationToken = default)
     {
